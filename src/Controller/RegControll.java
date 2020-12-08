@@ -43,20 +43,22 @@ public class RegControll extends HttpServlet {
 		Management mg = new Management();
 		boolean result = mg.enterance(1,uib,null);
 		
+		
 		if (result) {// 회원가입이 성공했으면 성공창으로
+			
 			RequestDispatcher rd = request.getRequestDispatcher("alert.jsp");//로그인 성공 페이지로
 			request.setAttribute("result", 2);//로그인 페이지로
 			request.setAttribute("value", "회원가입이 성공되었습니다.");
 			rd.forward(request, response);
 		}else {// 실패했으면 실패창으로
 			if (uib.getRequestValue().equals("2")) {
-				RequestDispatcher rd = request.getRequestDispatcher("alert.jsp");//로그인 성공 페이지로
+				RequestDispatcher rd = request.getRequestDispatcher("alert.jsp");
 				request.setAttribute("result", 3);//다시 회원가입 페이지로
 				request.setAttribute("value", "회원가입이 실패했습니다.");
 				rd.forward(request, response);
 				
 			}else if(uib.getRequestValue().equals("3")) {
-				RequestDispatcher rd = request.getRequestDispatcher("alert.jsp");//로그인 성공 페이지로
+				RequestDispatcher rd = request.getRequestDispatcher("alert.jsp");
 				request.setAttribute("result", 3);//다시 회원가입 페이지로
 				request.setAttribute("value", "아이디가 중복됩니다.");
 				rd.forward(request, response);

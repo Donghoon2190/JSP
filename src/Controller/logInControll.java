@@ -44,7 +44,6 @@ public class logInControll extends HttpServlet {
 		if (result) {// 로그인 성공햇으면 메인페이지
 			HttpSession hs = request.getSession();
 			
-			System.out.println(uib.getUserLevel());
 			hs.setAttribute("id", uib.getUserId());
 			hs.setAttribute("add", uib.getUserAdd());
 			hs.setAttribute("nickname", uib.getUserNickname());

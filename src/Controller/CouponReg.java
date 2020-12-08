@@ -9,34 +9,22 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import Service.CommunityService;
+import com.sun.xml.internal.bind.v2.schemagen.xmlschema.Redefinable;
 
-/**
- * Servlet implementation class communityDel
- */
-@WebServlet("/communityDel")
-public class CommunityDel extends HttpServlet {
+import Service.CouponService;
+
+@WebServlet("/CouponReg")
+public class CouponReg extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
-    public CommunityDel() {
+    public CouponReg() {
         super();
-        // TODO Auto-generated constructor stub
     }
 
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
 		doProcess(request, response);
 	}
 
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		doProcess(request, response);
@@ -45,21 +33,36 @@ public class CommunityDel extends HttpServlet {
 		request.setCharacterEncoding("UTF-8");
 		response.setContentType("text/html; charset=UTF-8");
 		
-		int bNum = Integer.parseInt(request.getParameter("Num"));
-		CommunityService delsvc = new CommunityService();
-		int delResult = delsvc.enterance(5,bNum,0,null,null);
-		// 댓글이랑 떰즈 다 삭제
+		System.out.println("wegewrgerg");
+		String meid = request.getParameter("id");
+		String coupon = request.getParameter("coupon");
+		System.out.println(coupon);
 		
-		if(delResult>0) {
+		CouponService cs = new CouponService();
+		boolean result = cs.enterance(1, meid, coupon);
+		System.out.println(result+"서블릿");
+		if (result) {
 			RequestDispatcher rd = request.getRequestDispatcher("alert.jsp");
-			request.setAttribute("value", "게시글이 삭제되었습니다.");
-			request.setAttribute("result", 5);
+			request.setAttribute("result", 1);
+			request.setAttribute("value", "응모에 성공했습니다.");
 			rd.forward(request, response);
-			
-		} else {
-			response.sendRedirect("BoardWrite.jsp"); // 게시글 삭제 실패했을때 페이지
+		}else {
+			RequestDispatcher rd = request.getRequestDispatcher("alert.jsp");
+			request.setAttribute("result", 1);
+			request.setAttribute("value", "이미 응모하셨습니다.");
+			rd.forward(request, response);
 		}
-		
 	}
 
 }
+
+
+
+
+
+
+
+
+
+
+

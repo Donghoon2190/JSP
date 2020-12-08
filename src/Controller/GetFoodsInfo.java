@@ -9,6 +9,10 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 import Dto.FoodInfoBean;
 import Service.FoodsService;
@@ -49,12 +53,35 @@ public class GetFoodsInfo extends HttpServlet {
 		
 		ArrayList<FoodInfoBean> list = new ArrayList<FoodInfoBean>();
 		
-		FoodsService fs = new FoodsService();
-		fs.enterance(1,list);
+		String foodCode = request.getParameter("foodCode");
+		if(foodCode==null) foodCode = "0%";
 		
-		if (list.get(0).getFoComment()!=null) {
+		HttpSession hs = request.getSession();
+		System.out.println(hs.getAttribute("id"));
+		System.out.println(hs.getAttribute("level"));
+		
+		
+		FoodsService fs = new FoodsService();
+		fs.enterance(1, list, foodCode);
+		
+		JSONObject obj = new JSONObject();
+		JSONArray arr;
+		
+		for (int i = 0; i < list.size(); i++) {
+			
+			arr = new JSONArray();
+			arr.add(list.get(i).getFoCode());
+			arr.add(list.get(i).getFoName());
+			arr.add(list.get(i).getFoComment());
+			arr.add(list.get(i).getFoFileName());
+			
+			obj.put(new Integer(i), arr);
+		}
+		
+		if (list.get(0).getFoName()!=null) {
+			request.setAttribute("data", obj);
+			hs.setAttribute("level", hs.getAttribute("level"));
 			RequestDispatcher rd = request.getRequestDispatcher("MainRank.jsp");
-			request.setAttribute("list", list);
 			rd.forward(request, response);
 		}else {
 			RequestDispatcher rd = request.getRequestDispatcher("alert.jsp");
@@ -66,6 +93,7 @@ public class GetFoodsInfo extends HttpServlet {
 	}
 
 }
+
 
 
 

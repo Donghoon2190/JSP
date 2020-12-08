@@ -9,19 +9,22 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.sun.xml.internal.bind.v2.runtime.unmarshaller.Discarder;
+
+import Dto.BoardInfoBean;
 import Service.CommunityService;
 
 /**
  * Servlet implementation class communityDel
  */
-@WebServlet("/communityDel")
-public class CommunityDel extends HttpServlet {
+@WebServlet("/CommunityReplyDel")
+public class CommunityReplyDel extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public CommunityDel() {
+    public CommunityReplyDel() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -45,20 +48,24 @@ public class CommunityDel extends HttpServlet {
 		request.setCharacterEncoding("UTF-8");
 		response.setContentType("text/html; charset=UTF-8");
 		
-		int bNum = Integer.parseInt(request.getParameter("Num"));
-		CommunityService delsvc = new CommunityService();
-		int delResult = delsvc.enterance(5,bNum,0,null,null);
-		// 댓글이랑 떰즈 다 삭제
-		
-		if(delResult>0) {
-			RequestDispatcher rd = request.getRequestDispatcher("alert.jsp");
-			request.setAttribute("value", "게시글이 삭제되었습니다.");
-			request.setAttribute("result", 5);
-			rd.forward(request, response);
+
+		BoardInfoBean bib = new BoardInfoBean();
+		bib.setNum(Integer.parseInt(request.getParameter("num")));
+		bib.setDate((String)request.getParameter("date"));
+		String page = request.getParameter("page");
+
+		CommunityService cs = new CommunityService();
+		if(cs.enterance(2, null, bib, null)) {
+		request.setAttribute("page", page);
+		request.setAttribute("Num", request.getParameter("num"));
+		request.getRequestDispatcher("oneCommunityView").forward(request, response);
+		}else {
+		request.setAttribute("page", page);
+		request.setAttribute("Num", request.getParameter("num"));
+		request.getRequestDispatcher("oneCommunityView").forward(request, response);
 			
-		} else {
-			response.sendRedirect("BoardWrite.jsp"); // 게시글 삭제 실패했을때 페이지
 		}
+		
 		
 	}
 

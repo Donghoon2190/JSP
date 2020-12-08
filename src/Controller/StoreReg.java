@@ -9,37 +9,24 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.oreilly.servlet.MultipartRequest;
+import com.oreilly.servlet.multipart.DefaultFileRenamePolicy;
+
 import Dto.StoreInfoBean;
 import Service.StoreService;
 
-/**
- * Servlet implementation class StoreReg
- */
 @WebServlet("/StoreReg")
 public class StoreReg extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
     public StoreReg() {
         super();
-        // TODO Auto-generated constructor stub
     }
 
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
 		doProcess(request, response);
 	}
-
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
 		doProcess(request, response);
 	}
 	protected void doProcess(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -48,21 +35,28 @@ public class StoreReg extends HttpServlet {
 		
 		StoreInfoBean sib = new StoreInfoBean();
 		
-		sib.setStoreName(request.getParameter("name"));
-		sib.setCaCode(request.getParameter("foods"));
-//		sib.setStoreCode(request.getParameter("name"));
-		sib.setStoreAdd(request.getParameter("add"));
-		sib.setStoreTel(request.getParameter("tel"));
+		int size = 10 * 1024 * 1024; 
+		String savePath = "D:/javaspace/dhspace/newFolderProject/WebContent/fileUpload"; 
 		
-		System.out.println(sib.getCaCode());
-		System.out.println(sib.getStoreName());
-		System.out.println(sib.getStoreAdd());
-		System.out.println(sib.getStoreTel());
+		MultipartRequest multi = new MultipartRequest(
+				request,	
+				savePath,	
+				size,		
+				"UTF-8",	
+				new DefaultFileRenamePolicy()
+		);
 		
+		sib.setStoreName(multi.getParameter("name"));
+		sib.setCaCode(multi.getParameter("foods"));
+		sib.setStoreAdd(multi.getParameter("add"));
+		sib.setStoreTel(multi.getParameter("tel"));
+		sib.setStoreComment(multi.getParameter("comment"));
+		sib.setFileName(multi.getOriginalFileName((String)multi.getFileNames().nextElement()));
+	
 		StoreService ss = new StoreService();
-		boolean result = ss.enterance(1, sib);
+		int result = ss.enterance(1,0,0,sib,null);
 		
-		if (result) {
+		if (result>0) {
 			RequestDispatcher rd = request.getRequestDispatcher("alert.jsp");
 			request.setAttribute("result", 1);
 			request.setAttribute("value", "가게 등록 요청을 성공했습니다.");

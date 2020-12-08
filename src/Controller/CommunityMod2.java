@@ -9,19 +9,23 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.oreilly.servlet.MultipartRequest;
+import com.oreilly.servlet.multipart.DefaultFileRenamePolicy;
+
+import Dto.BoardInfoBean;
 import Service.CommunityService;
 
 /**
- * Servlet implementation class communityDel
+ * Servlet implementation class communityMod1
  */
-@WebServlet("/communityDel")
-public class CommunityDel extends HttpServlet {
+@WebServlet("/communityMod2")
+public class CommunityMod2 extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public CommunityDel() {
+    public CommunityMod2() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -45,21 +49,39 @@ public class CommunityDel extends HttpServlet {
 		request.setCharacterEncoding("UTF-8");
 		response.setContentType("text/html; charset=UTF-8");
 		
-		int bNum = Integer.parseInt(request.getParameter("Num"));
-		CommunityService delsvc = new CommunityService();
-		int delResult = delsvc.enterance(5,bNum,0,null,null);
-		// 댓글이랑 떰즈 다 삭제
+		int size = 10 * 1024 * 1024; 
+		String savePath = "D:/javaspace/dhspace/newFolderProject/WebContent/fileUpload";
 		
-		if(delResult>0) {
+		MultipartRequest multi = new MultipartRequest(
+				request,	
+				savePath,	
+				size,		
+				"UTF-8",	
+				new DefaultFileRenamePolicy()
+		);
+		
+		BoardInfoBean bib = new BoardInfoBean();
+		bib.setNum(Integer.parseInt(multi.getParameter("num")));
+		bib.setTitle(multi.getParameter("title"));
+		bib.setContent(multi.getParameter("content"));
+		bib.setFile(multi.getOriginalFileName((String)multi.getFileNames().nextElement()));
+
+		
+		CommunityService prosvc = new CommunityService();
+		int proResult = prosvc.enterance(4,0,0,null,bib);
+	
+		if(proResult>0) {
+				RequestDispatcher rd = request.getRequestDispatcher("alert.jsp");
+				request.setAttribute("result", 1);
+				request.setAttribute("value", "정상적으로 수정되었습니다.");
+				rd.forward(request, response);
+				
+			} else {
 			RequestDispatcher rd = request.getRequestDispatcher("alert.jsp");
-			request.setAttribute("value", "게시글이 삭제되었습니다.");
-			request.setAttribute("result", 5);
+			request.setAttribute("result", 1);
+			request.setAttribute("value", "수정이 실패하였습니다.");
 			rd.forward(request, response);
-			
-		} else {
-			response.sendRedirect("BoardWrite.jsp"); // 게시글 삭제 실패했을때 페이지
-		}
-		
+			}
 	}
 
 }

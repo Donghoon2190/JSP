@@ -1,6 +1,7 @@
 package Controller;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -11,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import Service.CommunityService;
 import Dto.BoardInfoBean;
+import Dto.pageInfoBean;
 
 /**
  * Servlet implementation class communityBoard
@@ -45,29 +47,63 @@ public class OneCommunityView extends HttpServlet {
 	protected void doProcess(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		request.setCharacterEncoding("UTF-8");
 		response.setContentType("text/html; charset=UTF-8");
-		// 게시판 상세보기
-		int bNum = Integer.parseInt(request.getParameter("Num"));
-		String page = request.getParameter("page");
 		
+		
+		int bNum;
+		String page;
+		
+		if(request.getParameter("Num")==null) {
+			bNum = Integer.parseInt((String) request.getAttribute("Num"));
+			page = (String)request.getAttribute("page");
+		}else {
+			bNum = Integer.parseInt(request.getParameter("Num"));
+			page = request.getParameter("page");
+		}
+		int rePage = 1;
+		int limit = 4;
+		
+		
+		if(request.getParameter("rePage")!=null) {
+			rePage = Integer.parseInt(request.getParameter("rePage"));
+		}
+		
+		ArrayList<BoardInfoBean> reList = new ArrayList<BoardInfoBean>();
 		CommunityService cs = new CommunityService();
 		BoardInfoBean  board = new BoardInfoBean();
-		cs.enterance(3,bNum,0,null,board); 
+		pageInfoBean pib = new pageInfoBean();
+		int start = ((int)(rePage*0.9)*limit)+1;
+		int end = (start-1) + limit;
 		
+		pib.setStartPage(start);
+		pib.setEndPage(end);
+		pib.setBoardNum(bNum);
+		
+		if(cs.enterance(3, pib, board,reList)) {
+			request.setAttribute("reply", reList);
+		}else {
+			System.out.println("댓글 불러오기 실패");
+		}
+		int max = (pib.getMaxPage()%limit)==0?pib.getMaxPage()/limit:pib.getMaxPage()/limit+1;
+		System.out.println(max);
 		if(board.getContent() != null) {
 			RequestDispatcher dispatcher = request.getRequestDispatcher("Communitydeatil.jsp");
-			String hiddenId;
-			hiddenId = board.getWriterId().substring(0,3);
-			for (int i = 0; i < board.getWriterId().length()-3; i++) {
-				hiddenId+="*";
-			}
-			System.out.println(board.getContent());
 			request.setAttribute("view", board);
-			request.setAttribute("hiddenId", hiddenId);
 			request.setAttribute("page", page);
+			request.setAttribute("rePage",rePage);
+			request.setAttribute("max",max);
 			dispatcher.forward(request, response);
 		} else {
-			response.sendRedirect("BoardWrite.jsp");
+			RequestDispatcher dispatcher = request.getRequestDispatcher("alert.jsp");
+			request.setAttribute("result", 1);
+			request.setAttribute("value", "값을 불러오지 못했습니다.");
+			dispatcher.forward(request, response);
 		}
 
 }
 }
+
+
+
+
+
+
