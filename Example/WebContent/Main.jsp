@@ -52,6 +52,7 @@ fetch('list.jsp').then((response)=>{
 		let index = text.split(',');
 		let ArrList = "";
 		for(let i of index){
+			// "of" 를 쓰면 배열안의 "값"이 들어가고 "in"을 쓰면 "배열명"이 들어감!
 			console.log(i)
 			ArrList += '<a href=\"#!'+i+'\" onclick=\"getjsp(\''+i+'\')\"><li> '+i+' </li></a>'
 		}
